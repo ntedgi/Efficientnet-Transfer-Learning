@@ -12,7 +12,7 @@ args = parser.parse_args()
 def eval(model_input, input_path):
     from src.model import ImageRecognitionModel
     model = ImageRecognitionModel(model_input)
-    results = model.predict(input_path)
+    results = model.predict_on_batch(input_path)
     for r in results:
         print(f'result for :{r.image_path}')
         print(f'{r.efficientnet_result}')

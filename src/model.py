@@ -1,11 +1,16 @@
 import os
+import time
+import math
 
-from efficientnet import get_custom_objects
-from efficientnet.keras import center_crop_and_resize, preprocess_input
+import numpy as np
+
+
 from keras.applications.imagenet_utils import decode_predictions
-from keras.layers import *
 from keras.models import load_model
 from skimage.io import imread
+
+from src.efficientnet_lib import get_custom_objects
+from src.efficientnet_lib.keras import center_crop_and_resize, preprocess_input
 
 
 def file_exist(path):
@@ -25,6 +30,7 @@ class Prediction:
     def __init__(self, label, probability):
         self.label = label
         self.probability = probability
+
     def __repr__(self):
         return f'({self.label},{self.probability}) '
 
@@ -120,3 +126,31 @@ class ImageRecognitionModel:
         image_bytes_repr = preprocess_input(image_bytes_repr)
         image_bytes_repr = np.expand_dims(image_bytes_repr, 0)
         return image_bytes_repr
+
+    def benchmarking(self, images_path, bulk_size):
+
+        def take_time(start_time):
+            return time.time() - start_time
+
+        def chunkIt(seq, num):
+            avg = len(seq) / float(num)
+            out = []
+            last = 0.0
+
+            while last < len(seq):
+                out.append(seq[int(last):int(last + avg)])
+                last += avg
+            return out
+
+        start = time.time()
+        print('start loading images')
+        data_set = read_all_files_inside_dir(images_path)
+        print(f'finish loading {len(data_set)} images path after {take_time(start)}')
+        chunks = chunkIt(data_set, bulk_size)
+        for chunk in chunks:
+            start_chunk = time.time()
+            data_set_image_bytes_repr = map(self.prepare_image_for_prediction, chunk)
+            data_set_image_bytes_repr = list(map(lambda x: x[0], data_set_image_bytes_repr))
+            prediction = self.model.predict_on_batch(np.array(data_set_image_bytes_repr, dtype=np.int))
+            finish_t = take_time(start_chunk)
+            print(f'finish predicting {len(chunk)} images in {"{0:.2f}".format(finish_t)}/sec . avg {"{0:.2f}".format(finish_t/len(chunk))}/sec - per image  . {math.floor(1/(finish_t/len(chunk)))} images per sec ')
