@@ -13,7 +13,7 @@ class CreationTests(unittest.TestCase):
 
     def test_intilized_model_with_correct_model_path(self):
         try:
-            ImageRecognitionModel(os.path.realpath("./../bin/model.h5"))
+            ImageRecognitionModel(os.path.realpath("./../bin/model-3-pred.h5"))
         except FileNotFoundError:
             self.fail("test_intilized_model_with_correct_model_path() raised ExceptionType unexpectedly!")
 
@@ -22,7 +22,7 @@ class PredictionsTests(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
         unittest.TestCase.__init__(self, *args, **kwargs)
-        self.model = ImageRecognitionModel(os.path.realpath("../bin/model.h5"))
+        self.model = ImageRecognitionModel(os.path.realpath("../bin/model-3-pred.h5"))
 
     def test_make_simple_prediction(self):
         try:

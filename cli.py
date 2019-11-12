@@ -22,4 +22,4 @@ def eval(model_input, input_path):
 
 eval(args.p, args.i)
 
-# python cli -p "/home/naor/projects/efficientnetretrainedmodel/bin/model-3-pred.h5" -i "/home/naor/projects/efficientnetretrainedmodel/samples/knifes"
+
